@@ -3,5 +3,11 @@ uuid = "5d3a874e-6454-4b32-9ce4-09d81493fc87"
 authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
 version = "0.1.0-DEV"
 
+[deps]
+ConcurrentCollections = "5060bff5-0b44-40c5-b522-fcd3ca5cecdd"
+LeftRight = "78a604cf-3861-458a-9dc0-49592e8d97d7"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SplittablesBase = "171d559e-b47b-412a-8079-5efa626c420e"
+
 [compat]
 julia = "1.6"

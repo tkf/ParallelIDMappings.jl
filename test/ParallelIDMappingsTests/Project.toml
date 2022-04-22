@@ -1,0 +1,11 @@
+name = "ParallelIDMappingsTests"
+uuid = "43b734e9-27c8-44ff-89de-761cb6b68464"
+authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
+version = "0.1.0-DEV"
+
+[deps]
+ParallelIDMappings = "5d3a874e-6454-4b32-9ce4-09d81493fc87"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1.6"
