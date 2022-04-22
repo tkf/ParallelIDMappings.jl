@@ -1,0 +1,7 @@
+name = "ParallelIDMappings"
+uuid = "5d3a874e-6454-4b32-9ce4-09d81493fc87"
+authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
+version = "0.1.0-DEV"
+
+[compat]
+julia = "1.6"
