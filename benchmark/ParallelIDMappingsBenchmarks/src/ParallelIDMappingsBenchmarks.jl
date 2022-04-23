@@ -3,9 +3,11 @@ module ParallelIDMappingsBenchmarks
 using BenchmarkTools: Benchmark, BenchmarkGroup
 
 include("bench_pool.jl")
+include("bench_intern.jl")
 
 const MODULES = [
     BenchPool,
+    BenchIntern,
     # ...
 ]
 

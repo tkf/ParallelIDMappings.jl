@@ -148,6 +148,9 @@ end
 ### Some useful APIs for GenericIDMappings
 ###
 
+Base.eachindex(a::GenericIDMappings) = eachindex(a.refs)
+Base.eachindex(a::GenericIDMappings, b::GenericIDMappings) = eachindex(a.refs, b.refs)
+
 Base.@propagate_inbounds Base.getindex(a::GenericIDMappings, i) = a.pool[a.refs[i]]
 
 function Base.:(==)(a::GenericIDMappings, b::GenericIDMappings)
@@ -155,7 +158,7 @@ function Base.:(==)(a::GenericIDMappings, b::GenericIDMappings)
     ok = isequal(a.refs, b.refs) && isequal(a.pool, b.pool)
     ok && return true
 
-    for i in eachindex(a.refs, b.refs)
+    for i in eachindex(a, b)
         x = @inbounds a[i]
         y = @inbounds b[i]
         isequal(x, y) || return false
