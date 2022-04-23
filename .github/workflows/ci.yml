@@ -32,7 +32,6 @@ jobs:
           Pkg.activate(".")
           Pkg.add([
               PackageSpec(url = "https://github.com/JuliaConcurrent/LeftRight.jl.git"),
-              PackageSpec(url = "https://github.com/JuliaConcurrent/ConcurrentCollections.jl.git"),
           ])
           Pkg.resolve()
         shell: julia --color=yes {0}
