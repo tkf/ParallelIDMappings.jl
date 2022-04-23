@@ -5,7 +5,12 @@ using ParallelIDMappings
 
 const CACHE = Ref{Any}()
 
-function setup(; nitems = 2^20, ps = [1e-3, 1e-4, 1e-5], options...)
+function setup(;
+    smoke = false,
+    nitems = smoke ? 10 : 2^20,
+    ps = smoke ? [0.1] : [1e-3, 1e-4, 1e-5],
+    options...,
+)
     probs = Iterators.map(ps) do p
         xs = ParallelIDMappings.randomstrings(nitems; p, nchars = 1000, options...)
         ys = similar(xs)
