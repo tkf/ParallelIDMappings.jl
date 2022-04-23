@@ -5,7 +5,12 @@ using ParallelIDMappings
 
 const CACHE = Ref{Any}()
 
-function setup(; nitems = 2^22, ps = [1e-4, 1e-5, 1e-6], options...)
+function setup(;
+    smoke = false,
+    nitems = smoke ? 10 : 2^22,
+    ps = smoke ? [0.1] : [1e-4, 1e-5, 1e-6],
+    options...,
+)
     CACHE[] = Dict(
         p => ParallelIDMappings.randomstrings(nitems; p, nchars = 1000, options...) for
         p in ps

@@ -39,7 +39,7 @@ function foreach_benchmark(f!, group::BenchmarkGroup)
 end
 
 function setup_smoke()
-    suite = setup()
+    suite = setup(smoke = true)
     foreach_benchmark(set_smoke_params!, suite)
     return suite
 end

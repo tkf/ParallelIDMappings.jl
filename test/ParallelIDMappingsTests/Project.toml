@@ -5,6 +5,7 @@ version = "0.1.0-DEV"
 
 [deps]
 ParallelIDMappings = "5d3a874e-6454-4b32-9ce4-09d81493fc87"
+ParallelIDMappingsBenchmarks = "a28e0a30-fdcf-4e99-8b48-59bb73260860"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
