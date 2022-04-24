@@ -46,25 +46,27 @@ function combine!(a, b)
     return a
 end
 
-function pool_localcopies_dac(xs, basesize)
-    if length(xs) <= basesize
-        return ParallelIDMappings.pool_serial(xs)
+function pool_localcopies_dac(chunks)
+    if length(chunks) == 0
+        return ParallelIDMappings.pool_serial(eltype(eltype(chunks))[])
+    elseif length(chunks) == 1
+        return ParallelIDMappings.pool_serial(first(chunks))
     else
-        left, right = halve(xs)
-        task = Threads.@spawn pool_localcopies_dac(right, basesize)
-        a = pool_localcopies_dac(left, basesize)
+        left, right = halve(chunks)
+        task = Threads.@spawn pool_localcopies_dac(right)
+        a = pool_localcopies_dac(left)
         b = fetch(task)::typeof(a)
         return combine!(a, b)
     end
 end
 
 ParallelIDMappings.pool_localcopies(xs; basesize = cld(length(xs), Threads.nthreads())) =
-    pool_localcopies_dac(xs, basesize)
+    pool_localcopies_dac(Iterators.partition(xs, basesize))
 
-function pool_concurrentdict_process_chunk!(refs, xs, nextid, invpool)
+function pool_concurrentdict_process_chunk!(refs, xs, chunk, nextid, invpool)
     localid = Ref(0)
     i = firstindex(refs)
-    for i in eachindex(refs, xs)
+    for i in chunk
         localid[] = 0
         id = get!(invpool, xs[i]) do
             local id = localid[]
@@ -78,17 +80,17 @@ function pool_concurrentdict_process_chunk!(refs, xs, nextid, invpool)
     end
 end
 
-function pool_concurrentdict_process_dac!(refs, xs, nextid, invpool, basesize)
-    if length(xs) <= basesize
-        pool_concurrentdict_process_chunk!(refs, xs, nextid, invpool)
+function pool_concurrentdict_process_dac!(refs, xs, chunks, nextid, invpool)
+    if length(chunks) == 0
+        pool_concurrentdict_process_chunk!(refs, xs, 1:0, nextid, invpool)
+    elseif length(chunks) == 1
+        pool_concurrentdict_process_chunk!(refs, xs, first(chunks), nextid, invpool)
     else
-        xs_left, xs_right = halve(xs)
-        refs_left, refs_right = halve(refs)
-        @assert length(xs_left) == length(refs_left)
+        left, right = halve(chunks)
         task = Threads.@spawn begin
-            pool_concurrentdict_process_dac!(refs_right, xs_right, nextid, invpool, basesize)
+            pool_concurrentdict_process_dac!(refs, xs, right, nextid, invpool)
         end
-        pool_concurrentdict_process_dac!(refs_left, xs_left, nextid, invpool, basesize)
+        pool_concurrentdict_process_dac!(refs, xs, left, nextid, invpool)
         wait(task)
     end
 end
@@ -100,7 +102,8 @@ function ParallelIDMappings.pool_concurrentdict(
     nextid = Threads.Atomic{Int}(1)
     invpool = ConcurrentDict{eltype(xs),Int}()
     refs = Vector{Int}(undef, length(xs))
-    pool_concurrentdict_process_dac!(refs, xs, nextid, invpool, basesize)
+    chunks = Iterators.partition(eachindex(refs, xs), basesize)
+    pool_concurrentdict_process_dac!(refs, xs, chunks, nextid, invpool)
     pool = Vector{eltype(xs)}(undef, nextid[] - 1)
     for (x, i) in invpool
         pool[i] = x
