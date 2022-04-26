@@ -9,6 +9,16 @@ function setup(;
     smoke = false,
     nitems = smoke ? 10 : 2^20,
     ps = smoke ? [0.1] : [1e-3, 1e-4, 1e-5],
+    include_serial = true,
+    fs = filter!(
+        !isnothing,
+        Any[
+            include_serial ? ParallelIDMappings.intern_serial! : nothing,
+            ParallelIDMappings.intern_localcopies!,
+            ParallelIDMappings.intern_concurrentdict!,
+            ParallelIDMappings.intern_leftright!,
+        ],
+    ),
     options...,
 )
     probs = Iterators.map(ps) do p
@@ -22,12 +32,7 @@ function setup(;
     suite = BenchmarkGroup()
     for p in ps
         s1 = suite["p=$p"] = BenchmarkGroup()
-        for f! in [
-            ParallelIDMappings.intern_serial!,
-            ParallelIDMappings.intern_localcopies!,
-            ParallelIDMappings.intern_concurrentdict!,
-            ParallelIDMappings.intern_leftright!,
-        ]
+        for f! in fs
             name = string(f!)
             @assert startswith(name, "intern_")
             impl = name[length("intern_")+1:end-1]
